@@ -14,7 +14,7 @@ WHERE LENGTH(c.duty_party) > 5
 	QueryCustomsIdForICPWithinOneMonthSql = `SELECT distinct lcp.customs_id
 FROM log_clearance_process lcp
          INNER JOIN base_customs c ON lcp.customs_id = c.customs_id
-WHERE c.declare_version = 0 
+WHERE c.declare_version = 0
   AND  c.duty_party = ?
   AND DATE_FORMAT(lcp.gmt_create, '%Y-%m') = ?
   AND (lcp.process_code = 'TAX'
@@ -85,7 +85,7 @@ FROM log_clearance_process lcp
          INNER JOIN base_customs_tax bct ON bct.customs_id = lcp.customs_id AND
                                             IF(lcp.process_code = 'TAX', bct.processing_status = 4,
                                                bct.processing_status = 115)
-         INNER JOIN service_customs_article sca ON bct.customs_id = sca.customs_id AND bct.itemnr = sca.item_number
+         INNER JOIN service_customs_article sca ON bct.customs_id = sca.customs_id AND bct.itemnr = sca.item_number AND sca.is_removed = false
          INNER JOIN base_description bd ON sca.product_no = bd.product_no AND bd.country = sca.country
 WHERE lcp.customs_id = ? AND lcp.process_code = ?
 ORDER BY bct.itemnr, bct.tax_type;`
@@ -123,7 +123,7 @@ WHERE c.customs_id = ? ;`
 
 	// QueryCustomsTrackingPodSql Query the customs' tracking pod
 	QueryCustomsTrackingPodSql = `SELECT b.bill_no,c.customs_id,
-       c.mrn AS mrn, 
+       c.mrn AS mrn,
        t.tracking_no, bf.uri
 FROM base_reference_tracking t
     	 INNER JOIN base_bill b ON t.bill_id = b.bill_id
@@ -163,10 +163,10 @@ WHERE t.customs_id = ? ;`
 	UpdateIcpIsNewestSql = `UPDATE service_icp SET is_newest = 0 WHERE duty_part = ? AND year = ? AND month = ?;`
 
 	// InsertServiceICP Insert row into service_icp
-	InsertServiceICP = `INSERT INTO service_icp (duty_part, name, year, month, icp_date,total, status, vat_note, is_newest) 
+	InsertServiceICP = `INSERT INTO service_icp (duty_part, name, year, month, icp_date,total, status, vat_note, is_newest)
 values (:duty_part, :name, :year, :month, :icp_date,:total,:status,:vat_note,:is_newest);`
 
 	// InsertServiceICPCustoms Insert row into service_icp_customs
-	InsertServiceICPCustoms = `INSERT INTO service_icp_customs (icp_name, xml_id, customs_id, tax_type,  in_excel) 
+	InsertServiceICPCustoms = `INSERT INTO service_icp_customs (icp_name, xml_id, customs_id, tax_type,  in_excel)
 values (:icp_name, '', :customs_id, :tax_type, :in_excel);`
 )
