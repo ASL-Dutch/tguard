@@ -58,7 +58,7 @@ FROM log_clearance_process lcp
          INNER JOIN base_customs_tax bct ON bct.customs_id = lcp.customs_id AND
                                             IF(lcp.process_code = 'TAX', bct.processing_status = 4,
                                                bct.processing_status = 115)
-         INNER JOIN service_customs_article sca ON bct.customs_id = sca.customs_id AND bct.itemnr = sca.item_number
+         INNER JOIN service_customs_article sca ON bct.customs_id = sca.customs_id AND bct.itemnr = sca.item_number and sca.is_removed = false
          INNER JOIN service_customs_value_process scvp ON sca.customs_value_process_id = scvp.id
          INNER JOIN base_description bd ON scvp.description_id = bd.id
 WHERE lcp.customs_id = ? AND lcp.process_code = ?
