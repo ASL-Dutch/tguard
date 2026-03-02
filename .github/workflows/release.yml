@@ -20,10 +20,10 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: 'stable'
+          go-version-file: 'go.mod'
 
       - name: Install dependencies
-        run: go mod download
+        run: go mod tidy && go mod download
 
       - name: Build and pack
         run: make
