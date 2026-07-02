@@ -17,7 +17,7 @@ WHERE c.declare_version = 0
   AND sci.is_master = 1
   AND DATE_FORMAT(lcp.gmt_create
           , '%Y-%m') = ?
-  AND lcp.process_code = 'RELEASED';`
+  AND (lcp.process_code = 'RELEASED' OR lcp.process_code = 'ALLOW_TRANSPORT');`
 
 	// QueryCustomsHasSplitSql 查询指定的customs_id是否是拆分报关
 	QueryCustomsHasSplitSql = `
@@ -52,7 +52,7 @@ FROM log_clearance_process lcp
          INNER JOIN service_customs_article sca ON scsa.article_id = sca.id and sca.is_removed = false
          INNER JOIN service_customs_value_process scvp ON sca.customs_value_process_id = scvp.id
          INNER JOIN base_description bd ON scvp.description_id = bd.id
-WHERE lcp.process_code = 'RELEASED'
+WHERE (lcp.process_code = 'RELEASED' OR lcp.process_code = 'ALLOW_TRANSPORT')
   AND lcp.customs_id = ?
 ORDER BY bct.itemnr, bct.tax_type;`
 )
