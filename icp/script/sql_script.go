@@ -7,8 +7,7 @@ FROM log_clearance_process lcp
          INNER JOIN base_customs c ON lcp.customs_id = c.customs_id
 WHERE LENGTH(c.duty_party) > 5
     AND DATE_FORMAT(lcp.gmt_create, '%Y-%m') = ?
-  AND (lcp.process_code = 'TAX'
-    OR lcp.process_code = 'TMP_TAX');`
+  AND lcp.process_code = 'RELEASED';`
 
 	// QueryCustomsIdForICPWithinOneMonthSql SQL is used to query the CustomsId of tax receipts within a month
 	QueryCustomsIdForICPWithinOneMonthSql = `SELECT distinct lcp.customs_id
@@ -17,8 +16,7 @@ FROM log_clearance_process lcp
 WHERE c.declare_version = 0
   AND  c.duty_party = ?
   AND DATE_FORMAT(lcp.gmt_create, '%Y-%m') = ?
-  AND (lcp.process_code = 'TAX'
-    OR lcp.process_code = 'TMP_TAX');`
+  AND lcp.process_code = 'RELEASED';`
 
 	// QueryCustomsICPBaseSql The SQL used to query base info of customs icp
 	QueryCustomsICPBaseSql = `SELECT bc.customs_id,
