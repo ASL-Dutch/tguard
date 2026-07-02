@@ -45,7 +45,8 @@ type FileOfICP struct {
 	// VatNoteDownloadDir
 	VatNoteDownloadDir string `json:"vat_note_download_dir"`
 	// Errors The ICP errors
-	Errors []string `json:"errors"`
+	Errors     []string `json:"errors"`
+	ErrorTotal int      `json:"error_total"`
 }
 
 // DutyNeedVatNote Whether duty needs vat note
@@ -224,7 +225,7 @@ func (f *FileOfICP) saveICPInfoIntoDB(status bool) {
 		Year:      dt.Year(),
 		Month:     int(dt.Month()),
 		IcpDate:   time.Now().UTC().Format("2006-01-02 15:04:05"),
-		Total:     len(f.CustomsIDs),
+		Total:     len(f.CustomsIDs) - f.ErrorTotal,
 		Status:    status,
 		VatNote:   f.VatNoteZipFileName,
 		IsNewest:  true,
@@ -280,6 +281,8 @@ func (f *FileOfICP) generateFillData() {
 			f.PodFileData = append(f.PodFileData, icp.PodFileData...)
 		} else {
 			f.Errors = append(f.Errors, icp.Errors...)
+			log.Printf("Generate ICP file failed, error: %v \n", icp.Errors)
+			f.ErrorTotal++
 		}
 	}
 }
