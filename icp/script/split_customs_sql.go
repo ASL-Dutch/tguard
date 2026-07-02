@@ -7,17 +7,18 @@ package script
 const (
 
 	// QueryCustomsByDutyPartyForMonthAfterSplitSql 查询指定月份的指定dutyParty的所有的customs_id。注意排除拆分报关时的子报关单
+	// ICP归属月份取 ALLOW_TRANSPORT 与 RELEASED 中较早的 gmt_create；先从 duty_party 缩小范围再聚合，避免全表 derived 扫描
 	QueryCustomsByDutyPartyForMonthAfterSplitSql = `
-SELECT DISTINCT c.customs_id
+SELECT c.customs_id
 FROM base_customs c
          INNER JOIN stats_customs_info sci ON c.customs_id = sci.customs_id
          INNER JOIN log_clearance_process lcp ON lcp.customs_id = c.customs_id
+    AND lcp.process_code IN ('RELEASED', 'ALLOW_TRANSPORT')
 WHERE c.declare_version = 0
   AND c.duty_party = ?
   AND sci.is_master = 1
-  AND DATE_FORMAT(lcp.gmt_create
-          , '%Y-%m') = ?
-  AND (lcp.process_code = 'RELEASED' OR lcp.process_code = 'ALLOW_TRANSPORT');`
+GROUP BY c.customs_id
+HAVING DATE_FORMAT(MIN(lcp.gmt_create), '%Y-%m') = ?;`
 
 	// QueryCustomsHasSplitSql 查询指定的customs_id是否是拆分报关
 	QueryCustomsHasSplitSql = `
